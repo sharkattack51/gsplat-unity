@@ -67,6 +67,10 @@ The `SH Degree` option sets the order of SH coefficients used for rendering. The
 
 The `Gamma To Linear` option is offered as a workaround to render Gamma Space Gsplat Assets in a project using the Linear Space. This will degrade the rendering quality, so changing the color space of the project or retraining the 3DGS asset is the recommended approach. If your project uses a linear color space and you do not wish to retrain your 3DGS assets, it is recommended to use [aras-p/UnityGaussianSplatting](https://github.com/aras-p/UnityGaussianSplatting).
 
+### Runtime Load
+
+Add the `Gsplat Runtime Loader` component to the scene. The `Gsplat Renderer` and `Box Collider` components will also be added automatically. You can specify the file path to your 3DGS asset and enable `LoadOnStart`, or call `public async UniTask LoadAsync()` from a script to load the .ply file in Runtime.
+
 ## Additional Documentation
 
 - [Implementation Details](./Documentation~/Implementation%20Details.md)

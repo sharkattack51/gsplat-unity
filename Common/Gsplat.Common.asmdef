@@ -1,13 +1,8 @@
 {
-    "name": "Gsplat.Editor",
+    "name": "Gsplat.Common",
     "rootNamespace": "",
-    "references": [
-        "GUID:52be883dfea9c42a99f8c99870bcf49e",
-        "GUID:5ef91cffd1997ee4e97e2145f69f5845"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "references": [],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": false,
