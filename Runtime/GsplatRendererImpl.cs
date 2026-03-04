@@ -11,6 +11,7 @@ namespace Gsplat
         public byte SHBands { get; private set; }
 
         MaterialPropertyBlock m_propertyBlock;
+        public MaterialPropertyBlock PropertyBlock { get{ return m_propertyBlock; } }
         public GraphicsBuffer PositionBuffer { get; private set; }
         public GraphicsBuffer ScaleBuffer { get; private set; }
         public GraphicsBuffer RotationBuffer { get; private set; }

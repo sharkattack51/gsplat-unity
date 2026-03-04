@@ -54,7 +54,8 @@ public class GsplatRuntimeLoader : MonoBehaviour
 
         bool success = false;
         PlyHeaderInfo plyInfo = null;
-        
+
+#pragma warning disable 1998
         await UniTask.Create(async (tkn) => {
             try
             {
@@ -65,6 +66,7 @@ public class GsplatRuntimeLoader : MonoBehaviour
                 Debug.LogErrorFormat("gsplat load error: {0}", e.Message);
             }
         },  cancellationToken: tkn);
+# pragma warning restore 1998
 
         await UniTask.DelayFrame(1);
 
@@ -98,7 +100,6 @@ public class GsplatRuntimeLoader : MonoBehaviour
         Debug.LogFormat(string.Format("gsplat unloaded: {0}", assetPath));
     }
 
-#pragma warning disable 1998
     // code from: Gsplat.Editor.GsplatImporter.cs
     private PlyHeaderInfo Load()
     {
@@ -190,5 +191,4 @@ public class GsplatRuntimeLoader : MonoBehaviour
 
         return plyInfo;
     }
-# pragma warning restore 1998
 }

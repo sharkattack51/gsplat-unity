@@ -21,6 +21,7 @@ namespace Gsplat
 
         GsplatAsset m_prevAsset;
         GsplatRendererImpl m_renderer;
+        public GsplatRendererImpl Renderer { get{ return m_renderer; } }
 
         public bool Valid => RenderBeforeUploadComplete ? SplatCount > 0 : SplatCount == GsplatAsset.SplatCount;
         public uint SplatCount => GsplatAsset ? GsplatAsset.SplatCount - m_pendingSplatCount : 0;
