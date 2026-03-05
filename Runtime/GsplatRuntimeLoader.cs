@@ -68,6 +68,9 @@ public class GsplatRuntimeLoader : MonoBehaviour
         },  cancellationToken: cancellationToken);
 # pragma warning restore 1998
 
+        if(cancellationToken.IsCancellationRequested)
+            return;
+
         await UniTask.DelayFrame(1);
 
         if(plyInfo != null && gsplatAsset != null && gsplatAsset.Bounds != null)
