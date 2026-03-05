@@ -43,12 +43,12 @@ public class GsplatRuntimeLoader : MonoBehaviour
     }
 
 
-    public async UniTask LoadAsync(Action<bool, object> OnLoaded = null, CancellationToken tkn = default)
+    public async UniTask LoadAsync(Action<bool, object> onLoaded = null, CancellationToken cancellationToken = default)
     {
-        await LoadAsync(assetPath, OnLoaded, tkn);
+        await LoadAsync(assetPath, onLoaded, cancellationToken);
     }
 
-    public async UniTask LoadAsync(string assetPath, Action<bool, object> OnLoaded = null, CancellationToken tkn = default)
+    public async UniTask LoadAsync(string assetPath, Action<bool, object> onLoaded = null, CancellationToken cancellationToken = default)
     {
         this.assetPath = assetPath;
 
@@ -65,7 +65,7 @@ public class GsplatRuntimeLoader : MonoBehaviour
             {
                 Debug.LogErrorFormat("gsplat load error: {0}", e.Message);
             }
-        },  cancellationToken: tkn);
+        },  cancellationToken: cancellationToken);
 # pragma warning restore 1998
 
         await UniTask.DelayFrame(1);
@@ -87,7 +87,7 @@ public class GsplatRuntimeLoader : MonoBehaviour
         else
             Debug.LogErrorFormat("gsplat data error");
 
-        OnLoaded?.Invoke(success, plyInfo);
+        onLoaded?.Invoke(success, plyInfo);
     }
 
     public void Unload()
