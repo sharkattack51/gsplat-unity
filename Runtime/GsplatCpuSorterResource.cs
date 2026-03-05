@@ -13,10 +13,10 @@ namespace Gsplat
         }
         private static readonly UintDescComparer s_Comparer = new UintDescComparer();
 
-        private const int k_RadixBits   = 8;
+        private const int k_RadixBits = 8;
         private const int k_RadixBuckets = 1 << k_RadixBits; // 256
-        private const int k_RadixPasses  = 4; // 32bit / 8bit = 4パス
-        private const uint k_RadixMask  = k_RadixBuckets - 1; // 0xFF
+        private const int k_RadixPasses = 4; // 32bit/8bit = 4パス
+        private const uint k_RadixMask = k_RadixBuckets - 1; // 0xFF
 #endregion
 
         private GraphicsBuffer _orderBuffer;
@@ -31,8 +31,8 @@ namespace Gsplat
         private uint[] _orderData; // SetData用の最終出力バッファ
         private Vector3[] _positionCache; // GPU->CPU転送の受け取りバッファ
 
-        private int[]  _histogram; // ヒストグラム（256要素 × 再利用）
-        private int[]  _prefixSum; // プレフィックスサム（256要素 × 再利用）
+        private int[]  _histogram; // ヒストグラム(256要素 × 再利用)
+        private int[]  _prefixSum; // プレフィックスサム(256要素 × 再利用)
 
         public GraphicsBuffer PositionBuffer { get; }
         public GraphicsBuffer OrderBuffer => _orderBuffer;
@@ -132,20 +132,16 @@ namespace Gsplat
 
         private void LsdRadixSort()
         {
-            // LSD Radix Sort 8bit × 4パス
+            // LSD Radix Sort 8bit×4パス
             // 各パスでキーの特定8bitを使い安定ソートを4回繰り返す
-            // pingpongバッファを交互に使いArray.Copyを最小化
             uint[] keys = _depthKeys;
             uint[] keysTmp = _depthKeysTmp;
             uint[] vals = _indices;
             uint[] valsTmp = _indicesTmp;
 
-            // LSD は最下位ビットから処理するが、今回は「降順（遠い順）」にしたいので
-            // FloatToSortableUint で「遠い = 大きいuint」に変換済みであるため、
-            // 昇順のRadix Sortをそのまま適用すると最終的に昇順になる。
-            // 降順にするには最終パス後に結果を反転するか、
-            // 各パスのプレフィックスサムを後ろから詰める「降順Radix」にする。
-            // ここでは各パスを降順バケット割り当てで実装する（後ろから詰める）。
+            // LSDは最下位ビットから処理するが、「降順（遠い順）」にする
+            // FloatToSortableUintで「遠い=大きいuint」に変換済みであるため
+            // 各パスのプレフィックスサムを後ろから詰める「降順Radix」にする
             for(int pass = 0; pass < k_RadixPasses; pass++)
             {
                 int shift = pass * k_RadixBits;
@@ -155,12 +151,9 @@ namespace Gsplat
                 for(int i = 0; i < _splatCount; i++)
                     _histogram[(keys[i] >> shift) & k_RadixMask]++;
 
-                // プレフィックスサム 降順
-                // FloatToSortableUint により「遠い = 大きいuint」なので
-                // バケット255（最大値）が先頭になるよう255→0の順で先頭から積算
-                // 大きいキー = 小さいdest となり遠い順に並ぶ
+                // プレフィックスサム 降順 最大値が先頭になるよう255->0の順で先頭から積算
                 _prefixSum[k_RadixBuckets - 1] = 0;
-                for (int b = k_RadixBuckets - 2; b >= 0; b--)
+                for(int b = k_RadixBuckets - 2; b >= 0; b--)
                     _prefixSum[b] = _prefixSum[b + 1] + _histogram[b + 1];
 
                 // 散布
@@ -172,7 +165,7 @@ namespace Gsplat
                     valsTmp[dest] = vals[i];
                 }
 
-                // バッファ参照を入れ替える Array.Copyなし
+                // pingpongバッファ Array.Copyを回避
                 uint[] swapK = keys; 
                 keys = keysTmp;
                 keysTmp = swapK;

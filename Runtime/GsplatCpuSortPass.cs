@@ -20,13 +20,15 @@ namespace Gsplat
             Dispose();
         }
 
+
         public void Dispose()
         {
             _sorterResource?.Dispose();
             _sorterResource = null;
         }
 
-        // CommandBufferのコンテキストでCPUソートを実行しOrderBufferを更新する。
+
+        // CommandBufferのコンテキストでCPUソートを実行しOrderBufferを更新
         public void RecordSort(GraphicsBuffer positionBuffer, Camera camera)
         {
             if(positionBuffer == null || camera == null)

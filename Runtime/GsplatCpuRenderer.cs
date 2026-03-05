@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace Gsplat
 {
@@ -7,28 +6,13 @@ namespace Gsplat
     [RequireComponent(typeof(GsplatRenderer))]
     public class GsplatCpuRenderer : MonoBehaviour
     {
-        public static bool IsGpuSupport()
-        {
-            if(Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
-                return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12 && SystemInfo.graphicsShaderLevel >= 60;
-            else if(Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
-                return true;
-            else if(Application.platform == RuntimePlatform.Android)
-                return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan;
-            else if(Application.platform == RuntimePlatform.IPhonePlayer)
-                return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Metal;
-            else if(Application.platform == RuntimePlatform.WebGLPlayer)
-                return false;
-            else
-                return false;
-        }
-
         private static readonly int k_OrderBufferID = Shader.PropertyToID("_OrderBuffer");
+
+        public Camera renderCam;
 
         private GsplatRenderer gsplatRend;
         private GsplatCpuSortPass cpuSortPass;
-        private Camera cam;
-        private bool unregisterdGpu = false;
+        private bool unregisteredGpuSort = false;
 
 
         void Awake()
@@ -47,7 +31,7 @@ namespace Gsplat
             Camera.onPreCull -= OnPreCullCamera;
             Dispose();
 
-            unregisterdGpu = false;
+            unregisteredGpuSort = false;
         }
 
         void OnDestroy()
@@ -61,21 +45,23 @@ namespace Gsplat
         }
 
 
+        private void Dispose()
+        {
+            cpuSortPass?.Dispose();
+            cpuSortPass = null;
+        }
+
+
         private void Setup()
         {
             if(gsplatRend == null || gsplatRend.SplatCount <= 0)
                 return;
 
-            cam = Camera.main;
+            if(renderCam == null)
+                renderCam = Camera.main;
 
             Dispose();
             cpuSortPass = new GsplatCpuSortPass((int)gsplatRend.SplatCount);
-        }
-
-        private void Dispose()
-        {
-            cpuSortPass?.Dispose();
-            cpuSortPass = null;
         }
 
         private void DoCpuSort()
@@ -88,11 +74,11 @@ namespace Gsplat
             }
 
             if(gsplatRend.SorterResource.PositionBuffer == null
-                || cam == null)
+                || renderCam == null)
                 return;
 
             // CPUソートを実行 PositionBuffer->OrderBufferの更新
-            cpuSortPass.RecordSort(gsplatRend.SorterResource.PositionBuffer, cam);
+            cpuSortPass.RecordSort(gsplatRend.SorterResource.PositionBuffer, renderCam);
         }
 
         private void OnPreCullCamera(Camera cam)
@@ -104,10 +90,10 @@ namespace Gsplat
             // OrderBufferをシェーダーのMaterialPropertyBlockに上書き
             gsplatRend.Renderer.PropertyBlock.SetBuffer(k_OrderBufferID, cpuSortPass.OrderBuffer);
 
-            if(!unregisterdGpu)
+            if(!unregisteredGpuSort)
             {
                 GsplatSorter.Instance.UnregisterGsplat(gsplatRend);
-                unregisterdGpu = true;
+                unregisteredGpuSort = true;
             }
         }
     }

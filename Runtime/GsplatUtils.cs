@@ -3,6 +3,7 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Gsplat
 {
@@ -54,6 +55,22 @@ namespace Gsplat
                 worldBounds.Encapsulate(transform.TransformPoint(localCorners[i]));
 
             return worldBounds;
+        }
+
+        public static bool IsGpuSupport()
+        {
+            if(Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
+                return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12 && SystemInfo.graphicsShaderLevel >= 60;
+            else if(Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
+                return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Metal;
+            else if(Application.platform == RuntimePlatform.Android)
+                return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan;
+            else if(Application.platform == RuntimePlatform.IPhonePlayer)
+                return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Metal;
+            else if(Application.platform == RuntimePlatform.WebGLPlayer)
+                return false;
+            else
+                return false;
         }
     }
 }
