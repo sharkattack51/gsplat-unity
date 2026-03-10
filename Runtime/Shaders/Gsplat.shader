@@ -24,6 +24,9 @@ Shader "Gsplat/Standard"
             #pragma require compute
             #pragma multi_compile SH_BANDS_0 SH_BANDS_1 SH_BANDS_2 SH_BANDS_3
 
+            #pragma multi_compile_instancing //add
+            #pragma instancing_options assumeuniformscaling nolightmap nolightprobe //add
+
             #include "UnityCG.cginc"
             #include "Gsplat.hlsl"
             bool _GammaToLinear;

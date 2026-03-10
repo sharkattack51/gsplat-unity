@@ -46,7 +46,7 @@ namespace Gsplat
             frameCount++;
 
             // GPU Sort初回実行されるまで数フレーム待ってからReadbackをリクエスト
-            if(frameCount == k_ValidationFrameDelay && !validationRequested)
+            if((frameCount >= k_ValidationFrameDelay) && !validationRequested)
             {
                 if(gsplatRend.Renderer == null || gsplatRend.Renderer.OrderBuffer == null)
                     return;
@@ -57,23 +57,31 @@ namespace Gsplat
 
                 validationRequested = true;
 
-                AsyncGPUReadback.Request(orderBuffer, req => {
-                    if(req.hasError)
-                    {
-                        Debug.LogWarning("order buffer readback error.");
-                        FallbackToCpu();
-                        return;
-                    }
+                if(GsplatSorter.Instance.Valid)
+                {
+                    AsyncGPUReadback.Request(orderBuffer, req => {
+                        if(req.hasError)
+                        {
+                            Debug.LogWarning("order buffer readback error.");
+                            FallbackToCpu();
+                            return;
+                        }
 
-                    NativeArray<uint> data = req.GetData<uint>();
-                    if(IsOrderBufferUnsorted(data))
-                    {
-                        Debug.LogWarning("GPU sort id not runnnig.");
-                        FallbackToCpu();
-                    }
+                        NativeArray<uint> data = req.GetData<uint>();
+                        if(IsOrderBufferUnsorted(data))
+                        {
+                            Debug.LogWarning("GPU sort id not runnnig.");
+                            FallbackToCpu();
+                        }
 
-                    gpuSortValidated = true;
-                });
+                        gpuSortValidated = true;
+                    });
+                }
+                else
+                {
+                    Debug.LogWarning("GPU sorter invalid.");
+                    FallbackToCpu();
+                }
             }
         }
 
