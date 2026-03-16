@@ -71,6 +71,13 @@ The `Gamma To Linear` option is offered as a workaround to render Gamma Space Gs
 
 Add the `Gsplat Runtime Loader` component to the scene. The `Gsplat Renderer` and `Box Collider` components will also be added automatically. You can specify the file path to your 3DGS asset and enable `LoadOnStart`, or call `public async UniTask LoadAsync()` from a script to load the .ply file in Runtime.
 
+### DX11 Support (CPU Sort Fallback)
+
+GPU sorting requires D3D12, Metal, or Vulkan and is unavailable on Direct3D 11. Two components handle this fallback.
+
+- **GsplatGpuValidator** — Add to the same GameObject as `GsplatRenderer`. A few frames after startup it verifies GPU sorting via `OrderBuffer` readback; if sort is not running, it automatically adds `GsplatCpuRenderer`. An `OnFallbackToCpu` event is available for custom handling.
+- **GsplatCpuRenderer** — Performs CPU-based back-to-front depth sorting each frame. Set `RenderCam` to specify the depth-calculation camera (defaults to `Camera.main`). In most cases, attaching `GsplatGpuValidator` alone is sufficient.
+
 ## Additional Documentation
 
 - [Implementation Details](./Documentation~/Implementation%20Details.md)

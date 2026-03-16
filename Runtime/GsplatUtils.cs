@@ -60,7 +60,7 @@ namespace Gsplat
         public static bool IsGpuSupport()
         {
             if(Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
-                return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12 && SystemInfo.graphicsShaderLevel >= 60;
+                return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12;// && SystemInfo.graphicsShaderLevel >= 60;
             else if(Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor)
                 return SystemInfo.graphicsDeviceType == GraphicsDeviceType.Metal;
             else if(Application.platform == RuntimePlatform.Android)

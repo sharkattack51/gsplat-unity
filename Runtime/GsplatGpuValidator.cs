@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 namespace Gsplat
 {
     [RequireComponent(typeof(GsplatRenderer))]
-    public class GsplatGpuVaidator : MonoBehaviour
+    public class GsplatGpuValidator : MonoBehaviour
     {
         private GsplatRenderer gsplatRend;
         private bool gpuSortValidated = false;
@@ -39,7 +39,7 @@ namespace Gsplat
             if(gpuSortValidated)
             {
                 Debug.Log("GPU sort validated.");
-                GsplatGpuVaidator.Destroy(this);
+                GsplatGpuValidator.Destroy(this);
                 return;
             }
 
