@@ -119,9 +119,12 @@ namespace Gsplat
 
             // CPU Radixソート
             LsdRadixSort();
+        }
 
-            // GPU側のOrderBufferを更新
-            _orderBuffer.SetData(_orderData);
+        public void Upload(GraphicsBuffer targetBuffer)
+        {
+            // GPU側のOrderBufferをソートされたbufferで更新
+            targetBuffer.SetData(_orderData);
         }
 
         private static uint FloatToSortableUint(float value)

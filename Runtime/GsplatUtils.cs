@@ -72,5 +72,11 @@ namespace Gsplat
             else
                 return false;
         }
+
+        public static bool IsRuntimeDX11()
+        {
+            return ((Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
+                && SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D11);
+        }
     }
 }

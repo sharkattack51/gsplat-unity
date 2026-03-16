@@ -37,5 +37,10 @@ namespace Gsplat
             Matrix4x4 viewMatrix = camera.worldToCameraMatrix;
             _sorterResource.Sort(positionBuffer, viewMatrix);
         }
+
+        public void UploadSort(GraphicsBuffer targetBuffer)
+        {
+            _sorterResource.Upload(targetBuffer);
+        }
     }
 }

@@ -101,6 +101,9 @@ namespace Gsplat
 
         public GsplatSortPass(ComputeShader cs)
         {
+            if(GsplatUtils.IsRuntimeDX11())
+                return;
+
             m_CS = cs;
             if (cs)
             {
@@ -156,6 +159,9 @@ namespace Gsplat
 
         public void Dispatch(CommandBuffer cmd, Args args)
         {
+            if(GsplatUtils.IsRuntimeDX11())
+                return;
+
             Assert.IsTrue(Valid);
 
             GraphicsBuffer positionBuffer = args.PositionBuffer;

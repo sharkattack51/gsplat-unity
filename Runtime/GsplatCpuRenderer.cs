@@ -6,13 +6,10 @@ namespace Gsplat
     [RequireComponent(typeof(GsplatRenderer))]
     public class GsplatCpuRenderer : MonoBehaviour
     {
-        private static readonly int k_OrderBufferID = Shader.PropertyToID("_OrderBuffer");
-
         public Camera renderCam;
 
         private GsplatRenderer gsplatRend;
         private GsplatCpuSortPass cpuSortPass;
-        private bool unregisteredGpuSort = false;
 
 
         void Awake()
@@ -22,16 +19,12 @@ namespace Gsplat
 
         void OnEnable()
         {
-            Camera.onPreCull += OnPreCullCamera;
             Setup();
         }
 
         void OnDisable()
         {
-            Camera.onPreCull -= OnPreCullCamera;
             Dispose();
-
-            unregisteredGpuSort = false;
         }
 
         void OnDestroy()
@@ -62,6 +55,9 @@ namespace Gsplat
 
             Dispose();
             cpuSortPass = new GsplatCpuSortPass((int)gsplatRend.SplatCount);
+
+            // CPU ソートが引き継ぐため GPU ソートを解除
+            GsplatSorter.Instance.UnregisterGsplat(gsplatRend);
         }
 
         private void DoCpuSort()
@@ -73,28 +69,20 @@ namespace Gsplat
                     return;
             }
 
-            if(gsplatRend.SorterResource.PositionBuffer == null
+            if(gsplatRend == null
+                || gsplatRend.SorterResource == null
+                || gsplatRend.SorterResource.PositionBuffer == null
+                || gsplatRend.Renderer == null
+                || gsplatRend.Renderer.OrderBuffer == null
                 || renderCam == null)
                 return;
 
-            // CPUソートを実行 PositionBuffer->OrderBufferの更新
+            // CPUソートを実行 PositionBuffer->_orderData の更新
             cpuSortPass.RecordSort(gsplatRend.SorterResource.PositionBuffer, renderCam);
-        }
 
-        private void OnPreCullCamera(Camera cam)
-        {
-            if(gsplatRend.Renderer.PropertyBlock == null
-                || cpuSortPass.OrderBuffer == null)
-                return;
-
-            // OrderBufferをシェーダーのMaterialPropertyBlockに上書き
-            gsplatRend.Renderer.PropertyBlock.SetBuffer(k_OrderBufferID, cpuSortPass.OrderBuffer);
-
-            if(!unregisteredGpuSort)
-            {
-                GsplatSorter.Instance.UnregisterGsplat(gsplatRend);
-                unregisteredGpuSort = true;
-            }
+            // ソート結果を renderer.OrderBuffer に upload
+            // LateUpdate(33000) の DrawMeshInstancedIndirect より前に GPU へ送ることで正しい描画順を保証
+            cpuSortPass.UploadSort(gsplatRend.Renderer.OrderBuffer);
         }
     }
 }
